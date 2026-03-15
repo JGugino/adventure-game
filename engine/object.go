@@ -17,6 +17,7 @@ const (
 	UI           ObjectType = "ui"
 
 	//INFO: Object Tags
+	DEFAULT       ObjectTag = "default"
 	PLAYER        ObjectTag = "player"
 	UI_BACKGROUND ObjectTag = "ui_background"
 	UI_MIDGROUND  ObjectTag = "ui_midground"
@@ -46,71 +47,106 @@ type Object interface {
 }
 
 type ObjectManager struct {
-	Objects   []Object
+	Objects   map[string][]Object
 	DebugMode bool
+}
+
+func (o *ObjectManager) Init() {
+	o.Objects = make(map[string][]Object)
 }
 
 func (o *ObjectManager) Update(deltaTime float32, drag float32) {
 	//INFO: Update all registered Objects
-	for _, object := range o.Objects {
-		err := object.Update(deltaTime, drag)
+	for _, objs := range o.Objects {
+		for _, obj := range objs {
+			err := obj.Update(deltaTime, drag)
 
-		if err != nil {
-			LogError("Object failed to update")
-			LogError(err.Error())
-			return
+			if err != nil {
+				LogError("Object failed to update")
+				LogError(err.Error())
+				return
+			}
 		}
 	}
 }
 
 func (o *ObjectManager) Render() {
-	//INFO: Update all registered Objects
-	for _, object := range o.Objects {
 
-		var err error = nil
-
-		object.Render()
-
-		if object.GetType() == UI {
-			if object.GetTag() == UI_BACKGROUND {
-				err = object.Render()
-			}
-			if object.GetTag() == UI_MIDGROUND {
-				err = object.Render()
-			}
-
-			if object.GetTag() == UI_FOREGROUND {
-				err = object.Render()
-			}
-		}
+	//INFO: Default Render
+	for _, object := range o.Objects[string(DEFAULT)] {
+		err := object.Render()
 
 		if err != nil {
-			LogError("Object failed to render")
+			LogError(fmt.Sprintf("Object has failed to render - layer: %s", UI_BACKGROUND))
+			LogError(err.Error())
+			return
+		}
+	}
+
+	//INFO: Player Render
+	for _, object := range o.Objects[string(PLAYER)] {
+		err := object.Render()
+
+		if err != nil {
+			LogError(fmt.Sprintf("Object has failed to render - layer: %s", UI_BACKGROUND))
+			LogError(err.Error())
+			return
+		}
+	}
+
+	//INFO: ### UI ###
+
+	//INFO: UI Background Render
+	for _, object := range o.Objects[string(UI_BACKGROUND)] {
+		err := object.Render()
+
+		if err != nil {
+			LogError(fmt.Sprintf("Object has failed to render - layer: %s", UI_BACKGROUND))
+			LogError(err.Error())
+			return
+		}
+	}
+	//INFO: UI Midground Render
+	for _, object := range o.Objects[string(UI_MIDGROUND)] {
+		err := object.Render()
+
+		if err != nil {
+			LogError(fmt.Sprintf("Object has failed to render - layer: %s", UI_MIDGROUND))
+			LogError(err.Error())
+			return
+		}
+	}
+	//INFO: UI Foreground Render
+	for _, object := range o.Objects[string(UI_FOREGROUND)] {
+		err := object.Render()
+
+		if err != nil {
+			LogError(fmt.Sprintf("Object has failed to render - layer: %s", UI_FOREGROUND))
 			LogError(err.Error())
 			return
 		}
 	}
 }
 
-// Registers a new object to the object manager
-func (o *ObjectManager) RegisterObject(object Object) {
-	if !o.objectExists(object.GetId()) {
+// DOCS: Registers a new object to the object manager
+func (o *ObjectManager) RegisterObject(objectsLayer string, object Object) {
+	if !o.objectExists(o.Objects[objectsLayer], object.GetId()) {
 		if o.DebugMode {
 			LogInfo(fmt.Sprintf("Object registered: %s", object.GetId()))
 		}
 
-		o.Objects = append(o.Objects, object)
+		o.Objects[objectsLayer] = append(o.Objects[objectsLayer], object)
 		return
 	}
 
 	if o.DebugMode {
-		LogError(fmt.Sprintf("Object already registered: %s", object.GetId()))
+		LogError(fmt.Sprintf("Object already registered: %s, %s", object.GetId(), objectsLayer))
 	}
 }
 
-// Removes an object from the object manager
-func (o *ObjectManager) RemoveObject(object Object) {
-	objIndex := o.getObjectIndexById(object.GetId())
+// DOCS: Removes an object from the object manager
+func (o *ObjectManager) RemoveObject(objectLayer string, object Object) {
+	objIndex := o.getObjectIndexById(o.Objects[objectLayer], object.GetId())
 
 	if objIndex != -1 {
 		if o.DebugMode {
@@ -118,20 +154,20 @@ func (o *ObjectManager) RemoveObject(object Object) {
 		}
 
 		//Replace selected object with last object
-		o.Objects[objIndex] = o.Objects[len(o.Objects)-1]
+		o.Objects[objectLayer][objIndex] = o.Objects[objectLayer][len(o.Objects)-1]
 
 		//Sets objects equal to objects mius the last object
-		o.Objects = o.Objects[:len(o.Objects)-1]
+		o.Objects[objectLayer] = o.Objects[objectLayer][:len(o.Objects)-1]
 	}
 
 	if o.DebugMode {
-		LogError(fmt.Sprintf("Object doesn't exist: %s", object.GetId()))
+		LogError(fmt.Sprintf("Object doesn't exist: %s, %s", object.GetId(), objectLayer))
 	}
 }
 
-// Return true or false depending on if the object exists
-func (o *ObjectManager) objectExists(objId string) bool {
-	for _, obj := range o.Objects {
+// DOCS: Return true or false depending on if the object exists
+func (o *ObjectManager) objectExists(objects []Object, objId string) bool {
+	for _, obj := range objects {
 
 		if obj.GetId() == objId {
 			return true
@@ -142,9 +178,9 @@ func (o *ObjectManager) objectExists(objId string) bool {
 	return false
 }
 
-// Gets the index of an item inside of a slice with a matching id, return -1 if not fuund
-func (o *ObjectManager) getObjectIndexById(id string) int {
-	for i, item := range o.Objects {
+// DOCS: Gets the index of an item inside of a slice with a matching id, return -1 if not fuund
+func (o *ObjectManager) getObjectIndexById(objects []Object, id string) int {
+	for i, item := range objects {
 		if item.GetId() == id {
 			return i
 		}

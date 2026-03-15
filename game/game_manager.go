@@ -20,6 +20,8 @@ func (g *GameManager) Init() error {
 		DebugMode: g.DebugMode,
 	}
 
+	g.objectManager.Init()
+
 	//INFO: Register the player object
 	player := objects.Player{
 		Metadata: &engine.ObjectMetadata{
@@ -34,10 +36,21 @@ func (g *GameManager) Init() error {
 			Velocity:      rl.Vector2Zero(),
 			VelocityLimit: rl.Vector2{X: 2.0, Y: 2.0},
 		},
-		DebugMode: true,
+		DebugMode: false,
 	}
 
-	g.objectManager.RegisterObject(player)
+	block := objects.Block{
+		Metadata: &engine.ObjectMetadata{
+			Id:       "block",
+			Type:     engine.ENVIROMENT,
+			Tag:      engine.DEFAULT,
+			Position: rl.Vector2{X: 100, Y: 100},
+			Size:     rl.Vector2{X: 60, Y: 60},
+		},
+	}
+
+	g.objectManager.RegisterObject(string(engine.PLAYER), player)
+	g.objectManager.RegisterObject(string(engine.DEFAULT), block)
 
 	return nil
 }

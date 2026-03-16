@@ -2,7 +2,9 @@ package game
 
 import (
 	"adventure-game/engine"
+	"adventure-game/engine/ui"
 	"adventure-game/game/objects"
+	"fmt"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -17,7 +19,7 @@ func (g *GameManager) Init() error {
 
 	//INFO: Init object manager
 	g.objectManager = engine.ObjectManager{
-		DebugMode: g.DebugMode,
+		DebugMode: true,
 	}
 
 	g.objectManager.Init()
@@ -39,18 +41,48 @@ func (g *GameManager) Init() error {
 		DebugMode: false,
 	}
 
-	block := objects.Block{
+	button := ui.UIButton{
 		Metadata: &engine.ObjectMetadata{
-			Id:       "block",
-			Type:     engine.ENVIROMENT,
-			Tag:      engine.DEFAULT,
-			Position: rl.Vector2{X: 100, Y: 100},
-			Size:     rl.Vector2{X: 60, Y: 60},
+			Id:       "test-btn",
+			Type:     engine.UI,
+			Tag:      engine.UI_FOREGROUND,
+			Position: rl.Vector2{X: 60, Y: 60},
+			Size:     rl.Vector2{X: 400, Y: 100},
+		},
+		Text: engine.ObjectText{
+			Text:     "Example Button",
+			FontSize: 32,
+		},
+		Colors: engine.ObjectColors{
+			PrimaryColor: rl.Red,
+		},
+		Clickable: &engine.ObjectClickable{
+			Callback: func() {
+				fmt.Println("Button Clicked")
+			},
+		},
+	}
+
+	text := ui.UIText{
+		Metadata: &engine.ObjectMetadata{
+			Id:       "title-text",
+			Type:     engine.UI,
+			Tag:      engine.UI_FOREGROUND,
+			Position: rl.Vector2{X: float32(rl.GetScreenWidth()) / 2, Y: 66},
+			Size:     rl.Vector2{X: 48, Y: 48},
+		},
+		Text: engine.ObjectText{
+			Text:     "Adventure Game",
+			FontSize: 48,
+		},
+		Colors: engine.ObjectColors{
+			PrimaryColor: rl.Black,
 		},
 	}
 
 	g.objectManager.RegisterObject(string(engine.PLAYER), player)
-	g.objectManager.RegisterObject(string(engine.DEFAULT), block)
+	g.objectManager.RegisterObject(string(engine.UI_FOREGROUND), text)
+	g.objectManager.RegisterObject(string(engine.UI_FOREGROUND), button)
 
 	return nil
 }

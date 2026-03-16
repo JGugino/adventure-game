@@ -31,3 +31,11 @@ func (b Block) GetTag() engine.ObjectTag {
 func (b Block) GetType() engine.ObjectType {
 	return b.Metadata.Type
 }
+
+func (b Block) GetPosition() rl.Vector2 {
+	return b.Metadata.Position
+}
+
+func (b Block) GetSize() rl.Vector2 {
+	return b.Metadata.Size
+}

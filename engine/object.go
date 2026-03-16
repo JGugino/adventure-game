@@ -24,6 +24,7 @@ const (
 	UI_FOREGROUND ObjectTag = "ui_foreground"
 )
 
+// DOCS: Basic metadata for the object (id, tag, pos, etc.)
 type ObjectMetadata struct {
 	Id       string     `json:"id"`
 	Type     ObjectType `json:"type"`
@@ -32,18 +33,39 @@ type ObjectMetadata struct {
 	Size     rl.Vector2 `json:"size"`
 }
 
+// DOCS: Metadata for values used for moving an object (speed, velocity, etc.)
 type ObjectMovement struct {
 	Speed         float32    `json:"speed"`
 	Velocity      rl.Vector2 `json:"velocity"`
 	VelocityLimit rl.Vector2 `json:"velocityLimit"`
 }
 
+// DOCS: Callback for a clickable object (mostly used for ui)
+type ObjectClickable struct {
+	Callback func() `json:"callback"`
+}
+
+// DOCS: Colors to use for basic object rendering
+type ObjectColors struct {
+	PrimaryColor   rl.Color `json:"primaryColor"`
+	SecondaryColor rl.Color `json:"secondaryColor"`
+}
+
+// DOCS: Text to display on an object
+type ObjectText struct {
+	Text     string  `json:"text"`
+	FontSize float32 `json:"fontSize"`
+}
+
+// DOCS: Interface that defines required funcs for an Object
 type Object interface {
 	Update(deltaTime float32, drag float32) error
 	Render() error
 	GetId() string
 	GetType() ObjectType
 	GetTag() ObjectTag
+	GetPosition() rl.Vector2
+	GetSize() rl.Vector2
 }
 
 type ObjectManager struct {
@@ -75,6 +97,13 @@ func (o *ObjectManager) Render() {
 	//INFO: Default Render
 	for _, object := range o.Objects[string(DEFAULT)] {
 		err := object.Render()
+
+		if o.DebugMode {
+			pos := object.GetPosition()
+			size := object.GetSize()
+
+			rl.DrawRectangleLines(int32(pos.X), int32(pos.Y), int32(size.X), int32(size.Y), rl.DarkGreen)
+		}
 
 		if err != nil {
 			LogError(fmt.Sprintf("Object has failed to render - layer: %s", UI_BACKGROUND))

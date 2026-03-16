@@ -86,3 +86,11 @@ func (p Player) GetTag() engine.ObjectTag {
 func (p Player) GetType() engine.ObjectType {
 	return p.Metadata.Type
 }
+
+func (p Player) GetPosition() rl.Vector2 {
+	return p.Metadata.Position
+}
+
+func (p Player) GetSize() rl.Vector2 {
+	return p.Metadata.Size
+}

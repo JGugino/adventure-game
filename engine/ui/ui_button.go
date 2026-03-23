@@ -2,6 +2,7 @@ package ui
 
 import (
 	"adventure-game/engine"
+	"image/color"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -19,11 +20,21 @@ func (b UIButton) Update(deltaTime float32, drag float32) error {
 	if rl.GetMousePosition().X > b.Metadata.Position.X && rl.GetMousePosition().X < b.Metadata.Position.X+b.Metadata.Size.X {
 		if rl.GetMousePosition().Y > b.Metadata.Position.Y && rl.GetMousePosition().Y < b.Metadata.Position.Y+b.Metadata.Size.Y {
 
+			//INFO: If inside set Hovering to true
+			b.Clickable.Hovering = true
+
 			//INFO: If inside and left mouse button is clicked, trigger callback
 			if rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
 				b.Clickable.Callback()
 			}
-
+		} else {
+			if b.Clickable.Hovering {
+				b.Clickable.Hovering = false
+			}
+		}
+	} else {
+		if b.Clickable.Hovering {
+			b.Clickable.Hovering = false
 		}
 	}
 
@@ -31,7 +42,17 @@ func (b UIButton) Update(deltaTime float32, drag float32) error {
 }
 
 func (b UIButton) Render() error {
-	rl.DrawRectangle(int32(b.Metadata.Position.X), int32(b.Metadata.Position.Y), int32(b.Metadata.Size.X), int32(b.Metadata.Size.Y), b.Colors.PrimaryColor)
+
+	if !b.Clickable.Hovering {
+		rl.DrawRectangle(int32(b.Metadata.Position.X), int32(b.Metadata.Position.Y), int32(b.Metadata.Size.X), int32(b.Metadata.Size.Y), b.Colors.PrimaryColor)
+	} else {
+		if b.Colors.SecondaryColor == rl.ColorAlpha(color.RGBA{R: 0, G: 0, B: 0, A: 0}, 0) {
+			rl.DrawRectangle(int32(b.Metadata.Position.X), int32(b.Metadata.Position.Y), int32(b.Metadata.Size.X), int32(b.Metadata.Size.Y), b.Colors.PrimaryColor)
+		} else {
+			rl.DrawRectangle(int32(b.Metadata.Position.X), int32(b.Metadata.Position.Y), int32(b.Metadata.Size.X), int32(b.Metadata.Size.Y), b.Colors.SecondaryColor)
+		}
+
+	}
 
 	textSize := rl.MeasureTextEx(rl.GetFontDefault(), b.Text.Text, b.Text.FontSize, 1)
 

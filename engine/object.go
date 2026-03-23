@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"image/color"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -42,13 +43,14 @@ type ObjectMovement struct {
 
 // DOCS: Callback for a clickable object (mostly used for ui)
 type ObjectClickable struct {
+	Hovering bool   `json:"hovering"`
 	Callback func() `json:"callback"`
 }
 
 // DOCS: Colors to use for basic object rendering
 type ObjectColors struct {
-	PrimaryColor   rl.Color `json:"primaryColor"`
-	SecondaryColor rl.Color `json:"secondaryColor"`
+	PrimaryColor   color.RGBA `json:"primaryColor"`
+	SecondaryColor color.RGBA `json:"secondaryColor"`
 }
 
 // DOCS: Text to display on an object

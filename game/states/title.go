@@ -3,7 +3,6 @@ package states
 import (
 	"adventure-game/engine"
 	"adventure-game/engine/ui"
-	"fmt"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -13,13 +12,7 @@ type Title struct {
 }
 
 func (t Title) Init() {
-
-	t.Metadata.ObjManager = &engine.ObjectManager{
-		DebugMode: true,
-	}
-
-	t.Metadata.ObjManager.Init()
-
+	//INFO: Play button
 	button := ui.UIButton{
 		Metadata: &engine.ObjectMetadata{
 			Id:       "test-btn",
@@ -37,13 +30,18 @@ func (t Title) Init() {
 		},
 		Clickable: &engine.ObjectClickable{
 			Callback: func() {
-				state, err := t.Metadata.StateManager.ChangeState("game")
+				_, err := t.Metadata.StateManager.ChangeState("game")
 
-				fmt.Println(state, err)
+				if err != nil {
+					engine.LogError(err.Error())
+					return
+				}
+
 			},
 		},
 	}
 
+	//INFO: Title text
 	text := ui.UIText{
 		Metadata: &engine.ObjectMetadata{
 			Id:       "title-text",
@@ -61,6 +59,7 @@ func (t Title) Init() {
 		},
 	}
 
+	//INFO: Register the objects to the states object manager
 	t.Metadata.ObjManager.RegisterObject(string(engine.UI_FOREGROUND), text)
 	t.Metadata.ObjManager.RegisterObject(string(engine.UI_FOREGROUND), button)
 

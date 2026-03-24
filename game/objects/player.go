@@ -94,3 +94,11 @@ func (p Player) GetPosition() rl.Vector2 {
 func (p Player) GetSize() rl.Vector2 {
 	return p.Metadata.Size
 }
+
+func (p Player) GetActive() bool {
+	return p.Metadata.Active
+}
+
+func (p Player) SetActive(active bool) {
+	p.Metadata.Active = active
+}

@@ -23,14 +23,22 @@ func (g *GameManager) Init() error {
 
 	g.stateManager.RegisterState(TITLE_STATE, states.Title{
 		Metadata: &engine.StateMetadata{
-			Id:           TITLE_STATE,
+			Id: TITLE_STATE,
+			ObjManager: &engine.ObjectManager{
+				Objects:   make(map[string][]engine.Object),
+				DebugMode: true,
+			},
 			StateManager: &g.stateManager,
 		},
 	})
 
-	g.stateManager.RegisterState(GAME_STATE, states.Title{
+	g.stateManager.RegisterState(GAME_STATE, states.Game{
 		Metadata: &engine.StateMetadata{
-			Id:           GAME_STATE,
+			Id: GAME_STATE,
+			ObjManager: &engine.ObjectManager{
+				Objects:   make(map[string][]engine.Object),
+				DebugMode: true,
+			},
 			StateManager: &g.stateManager,
 		},
 	})

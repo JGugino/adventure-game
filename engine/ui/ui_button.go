@@ -84,3 +84,11 @@ func (b UIButton) GetPosition() rl.Vector2 {
 func (b UIButton) GetSize() rl.Vector2 {
 	return b.Metadata.Size
 }
+
+func (b UIButton) GetActive() bool {
+	return b.Metadata.Active
+}
+
+func (b UIButton) SetActive(active bool) {
+	b.Metadata.Active = active
+}

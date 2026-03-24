@@ -32,6 +32,7 @@ type ObjectMetadata struct {
 	Tag      ObjectTag  `json:"tag"`
 	Position rl.Vector2 `json:"position"`
 	Size     rl.Vector2 `json:"size"`
+	Active   bool       `json:"active"`
 }
 
 // DOCS: Metadata for values used for moving an object (speed, velocity, etc.)
@@ -68,6 +69,8 @@ type Object interface {
 	GetTag() ObjectTag
 	GetPosition() rl.Vector2
 	GetSize() rl.Vector2
+	GetActive() bool
+	SetActive(active bool)
 }
 
 type ObjectManager struct {
@@ -83,12 +86,14 @@ func (o *ObjectManager) Update(deltaTime float32, drag float32) {
 	//INFO: Update all registered Objects
 	for _, objs := range o.Objects {
 		for _, obj := range objs {
-			err := obj.Update(deltaTime, drag)
+			if obj.GetActive() {
+				err := obj.Update(deltaTime, drag)
 
-			if err != nil {
-				LogError("Object failed to update")
-				LogError(err.Error())
-				return
+				if err != nil {
+					LogError("Object failed to update")
+					LogError(err.Error())
+					return
+				}
 			}
 		}
 	}
@@ -98,30 +103,34 @@ func (o *ObjectManager) Render() {
 
 	//INFO: Default Render
 	for _, object := range o.Objects[string(DEFAULT)] {
-		err := object.Render()
+		if object.GetActive() {
+			err := object.Render()
 
-		if o.DebugMode {
-			pos := object.GetPosition()
-			size := object.GetSize()
+			if o.DebugMode {
+				pos := object.GetPosition()
+				size := object.GetSize()
 
-			rl.DrawRectangleLines(int32(pos.X), int32(pos.Y), int32(size.X), int32(size.Y), rl.DarkGreen)
-		}
+				rl.DrawRectangleLines(int32(pos.X), int32(pos.Y), int32(size.X), int32(size.Y), rl.DarkGreen)
+			}
 
-		if err != nil {
-			LogError(fmt.Sprintf("Object has failed to render - layer: %s", UI_BACKGROUND))
-			LogError(err.Error())
-			return
+			if err != nil {
+				LogError(fmt.Sprintf("Object has failed to render - layer: %s", UI_BACKGROUND))
+				LogError(err.Error())
+				return
+			}
 		}
 	}
 
 	//INFO: Player Render
 	for _, object := range o.Objects[string(PLAYER)] {
-		err := object.Render()
+		if object.GetActive() {
+			err := object.Render()
 
-		if err != nil {
-			LogError(fmt.Sprintf("Object has failed to render - layer: %s", UI_BACKGROUND))
-			LogError(err.Error())
-			return
+			if err != nil {
+				LogError(fmt.Sprintf("Object has failed to render - layer: %s", UI_BACKGROUND))
+				LogError(err.Error())
+				return
+			}
 		}
 	}
 
@@ -129,32 +138,39 @@ func (o *ObjectManager) Render() {
 
 	//INFO: UI Background Render
 	for _, object := range o.Objects[string(UI_BACKGROUND)] {
-		err := object.Render()
+		if object.GetActive() {
+			err := object.Render()
 
-		if err != nil {
-			LogError(fmt.Sprintf("Object has failed to render - layer: %s", UI_BACKGROUND))
-			LogError(err.Error())
-			return
+			if err != nil {
+				LogError(fmt.Sprintf("Object has failed to render - layer: %s", UI_BACKGROUND))
+				LogError(err.Error())
+				return
+			}
 		}
+
 	}
 	//INFO: UI Midground Render
 	for _, object := range o.Objects[string(UI_MIDGROUND)] {
-		err := object.Render()
+		if object.GetActive() {
+			err := object.Render()
 
-		if err != nil {
-			LogError(fmt.Sprintf("Object has failed to render - layer: %s", UI_MIDGROUND))
-			LogError(err.Error())
-			return
+			if err != nil {
+				LogError(fmt.Sprintf("Object has failed to render - layer: %s", UI_MIDGROUND))
+				LogError(err.Error())
+				return
+			}
 		}
 	}
 	//INFO: UI Foreground Render
 	for _, object := range o.Objects[string(UI_FOREGROUND)] {
-		err := object.Render()
+		if object.GetActive() {
+			err := object.Render()
 
-		if err != nil {
-			LogError(fmt.Sprintf("Object has failed to render - layer: %s", UI_FOREGROUND))
-			LogError(err.Error())
-			return
+			if err != nil {
+				LogError(fmt.Sprintf("Object has failed to render - layer: %s", UI_FOREGROUND))
+				LogError(err.Error())
+				return
+			}
 		}
 	}
 }
@@ -165,6 +181,8 @@ func (o *ObjectManager) RegisterObject(objectsLayer string, object Object) {
 		if o.DebugMode {
 			LogInfo(fmt.Sprintf("Object registered: %s", object.GetId()))
 		}
+
+		object.SetActive(true)
 
 		o.Objects[objectsLayer] = append(o.Objects[objectsLayer], object)
 		return

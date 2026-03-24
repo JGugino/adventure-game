@@ -18,6 +18,7 @@ func main() {
 	defer rl.CloseWindow()
 
 	rl.SetTargetFPS(TARGET_FPS)
+	rl.SetExitKey(-1)
 
 	gameManager := game.GameManager{
 		DebugMode: true,

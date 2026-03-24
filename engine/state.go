@@ -31,6 +31,7 @@ type StateManager struct {
 }
 
 func (s *StateManager) Init(startingState string) {
+	LogInfo("Init State Manager")
 	s.CurrentState = startingState
 	s.PreviousState = NO_STATE
 
@@ -38,8 +39,6 @@ func (s *StateManager) Init(startingState string) {
 }
 
 func (s *StateManager) Update(deltaTime float32, drag float32) {
-	//fmt.Println(s.States[s.CurrentState].GetObjectManager())
-
 	if s.CurrentState != NO_STATE {
 		s.States[s.CurrentState].Update(deltaTime, drag)
 	}
@@ -56,9 +55,7 @@ func (s *StateManager) ChangeState(id string) (string, error) {
 		s.PreviousState = s.CurrentState
 		s.CurrentState = id
 
-		//TODO: Not loading objects for next state
-
-		s.States[s.CurrentState].Init()
+		s.States[id].Init()
 		return state.GetId(), nil
 	}
 

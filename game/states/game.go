@@ -12,12 +12,6 @@ type Game struct {
 }
 
 func (g Game) Init() {
-	g.Metadata.ObjManager = &engine.ObjectManager{
-		DebugMode: true,
-	}
-
-	g.Metadata.ObjManager.Init()
-
 	//INFO: Register the player object
 	player := objects.Player{
 		Metadata: &engine.ObjectMetadata{
@@ -39,14 +33,10 @@ func (g Game) Init() {
 }
 
 func (g Game) Update(deltaTime float32, drag float32) {
-	if g.Metadata.ObjManager != nil {
-		g.Metadata.ObjManager.Update(deltaTime, drag)
-	}
+	g.Metadata.ObjManager.Update(deltaTime, drag)
 }
 func (g Game) Render() {
-	if g.Metadata.ObjManager != nil {
-		g.Metadata.ObjManager.Render()
-	}
+	g.Metadata.ObjManager.Render()
 }
 func (g Game) GetId() string {
 	return g.Metadata.Id

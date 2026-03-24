@@ -48,3 +48,11 @@ func (t UIText) GetPosition() rl.Vector2 {
 func (t UIText) GetSize() rl.Vector2 {
 	return t.Metadata.Size
 }
+
+func (t UIText) GetActive() bool {
+	return t.Metadata.Active
+}
+
+func (t UIText) SetActive(active bool) {
+	t.Metadata.Active = active
+}

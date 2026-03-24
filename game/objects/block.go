@@ -39,3 +39,11 @@ func (b Block) GetPosition() rl.Vector2 {
 func (b Block) GetSize() rl.Vector2 {
 	return b.Metadata.Size
 }
+
+func (b Block) GetActive() bool {
+	return b.Metadata.Active
+}
+
+func (b Block) SetActive(active bool) {
+	b.Metadata.Active = active
+}
